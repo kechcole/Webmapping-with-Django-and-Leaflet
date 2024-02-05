@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Load dataset folder -->
+  {% load static %}
+
+  <!-- Leaflet configuration -->
+  {% load leaflet_tags %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coles First template</title>
+
+    <!-- Configure leaflet. -->
+    {% leaflet_js %} {% leaflet_css %}
+
+    <!-- CSS -->
+    <style type="text/css">
+      #cole_gis {
+        height: 550px;
+        width: 80%;
+      }
+    </style>
+
+    <!-- STATIC FILES  -->
+    <!-- Load leaflet ajax from static folder -->
+    <script
+      type="text/javascript"
+      src="{% static 'dist/leaflet.ajax.js' %}"
+    ></script>  
+
+    <!-- Routing machine for leaflet  -->
+    <!-- css  -->
+    <script
+      type="text/css"
+      src="{% static 'leaflet_routing/leaflet-routing-machine.css' %}"
+    ></script>
+    <!-- js -->
+    <script
+      type="text/javascript"
+      src="{% static 'leaflet_routing/leaflet-routing-machine.js' %}"
+    ></script>
+    
+
+  </head>
+  <body>
+    <h1>Coles First Template.</h1>
+
+    <p>Created a new template , hurrah</p>
+
+    <p>Map</p>
+
+    <!-- javascript to load layers  -->
+    <script type="text/javascript">
+      // Function to load layers
+      function our_layers(map, options) {
+
+        // Add basemaps
+        // Basemaps
+        var OpenTopoMap = L.tileLayer(
+          "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          {
+            maxZoom: 10,
+            attribution:
+              'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+          }
+        );
+
+        var StadiaDark = L.tileLayer(
+          "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}",
+          {
+            minZoom: 0,
+            maxZoom: 20,
+            attribution:
+              '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            ext: "png",
+          }
+        );
+
+        var osm = L.tileLayer(
+          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            attribution:
+              '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          }
+        );
+
+        // Dataset 1 : pass variable in world application url files as a url
+        var keCities = new L.GeoJSON.AJAX("{% url 'ke_cities' %}", {
+          // optional parameters
+          // Display population
+          onEachFeature: function (feature, layer) {
+            // Collect attributes
+            const cityName = feature.properties.city.toString();
+            var pop = feature.properties.pop.toString();
+
+            // bind popup
+            layer.bindPopup(
+              "<b> Country : " +
+                cityName +
+                " </b> <br>" +
+                "<b> Population in 2005 : " +
+                pop +
+                "<b>"
+            );
+          },
+        });
+        // add to map
+        keCities.addTo(map);
+
+        // Polygon functions
+        // 2.1. Polygon colour Styling function
+        function setColour(pop) {
+          // Graduated scale
+          if (pop > 1000000000) return "#01665e";
+          else if (75000000 < pop && pop > 1000000000) return "#5ab4ac";
+          else if (50000000 < pop && pop > 75000000) return "#c7eae5";
+          else if (8000000 < pop && pop > 50000000) return "#f6e8c3";
+          else if (3000000 < pop && pop > 8000000) return "#d8b365";
+          return "#8c510a"; //#08519c
+        }
+
+        // 2.2. Reset borderline colour of the country polygon when mouse is over it
+        function colorlayer(feature, layer) {
+          // Get population and countru name
+          var countryPop = feature.properties.pop2005;
+          var countryName = feature.properties.name;
+
+          // when mouse is over set colour and its opcacity
+          layer.on("mouseover", function (e) {
+            layer.setStyle({
+              color: "yellow",
+              opacity: 0.5,
+            });
+
+            // bind popup
+            layer.bindPopup(
+              "<b> Country : " +
+                countryName +
+                " </b> <br>" +
+                "<b> Population in 2005 : " +
+                countryPop +
+                "<b>"
+            );
+          });
+
+          // when mouse leaves
+          layer.on("mouseout", function (e) {
+            // console.log(e.target._zoom);
+            // map.setZoom(2);
+            layer.setStyle({
+              color: "white",
+            });
+          });
+        }
+
+        // 2.3 Colour polygon based on population attribute
+        function colourFeatures(feature) {
+          // Get population attrubute
+          var pop = feature.properties.pop2005;
+
+          return {
+            color: "white",
+            opacity: 0.2,
+            fillColor: setColour(pop), // call setColour() funtion defined in 2.1
+            fillOpacity: 1.5,
+          };
+        }
+
+        // When mouse is clicked
+
+        // Add Dataset 2 to map 
+        var world_countries = new L.GeoJSON.AJAX("{% url 'wld_countries' %}", {
+          // call function(2.3) to colour polygon features
+          style: colourFeatures,
+
+          // Call function(2.2) to reset border colour
+          onEachFeature: colorlayer,
+        });
+
+        // Add world polygons to cole_gis leaflet map
+        world_countries.addTo(map);
+
+
+
+        // Add Layer controll  
+        // Base layer objects. 
+        const baselayers = {
+              'StadiaDark': StadiaDark,
+              '<b>OpenTopoMap</b>': OpenTopoMap,
+              '<i><b>OpenStreetMap</b></i>': osm,
+              }
+        
+        // vector data overlays , can ve also raster
+        const overlays = {
+          'kenyancities': keCities,
+          'worldcountries': world_countries,
+        }
+
+        // User to switch between above layers, first parameter is overlays
+        const layerControl = L.control.layers(baselayers, overlays).addTo(map);
+
+
+
+        // Routing App
+        L.Routing.control({
+          waypoints: [
+            L.latLng(57.74, 11.94),
+            L.latLng(57.6792, 11.949)
+          ]
+        })
+
+
+
+
+
+
+
+      }
+    </script>
+
+    {% leaflet_map "cole_gis" callback="window.our_layers" %}
+  </body>
+</html>
