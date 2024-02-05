@@ -86,8 +86,33 @@ admin.site.register(WorldCountries, WorldCountriesAdmin)
  ```
 
 ## 4. Add Basemap. 
-To change the basemap to leaflet, I created a class that inherits from imported leaflet module rather than model admin. 
+To change the basemap to leaflet, I created a class that inherits from imported leaflet module rather than model admin.
+```python
+from django.contrib import admin
+from .models import City   # Import model
+from leaflet.admin import LeafletGeoAdmin  # Import leaflet
 
+# Register your models here.
+# Create an admin for the model
+class CityAdmin(LeafletGeoAdmin):
+    # WHAT TO display in the admin, fields must correspond with model object
+    list_display = ['name', 'location']
+
+# Register into the admin
+admin.site.register(City, CityAdmin)
+``` 
+Then also add leaflet into the installed apps in settings python file and pass parameters i.e zoom level, center. 
+```python
+# Leaflet basemap configurations
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': [-0.02, 37],   # lat long coordinates 
+    'DEFAULT_ZOOM': 2,
+    'MAX_ZOOM': 20,  # Zoom in value , we want more details 
+    'MEAN_ZOOM': 0.5,
+    'SCALE': 'both',  # Other include 'imperial' and 'metric' which is default
+    'ATTRIBUTION_PREFIX': 'making gis easy',
+} 
+```
 
 ## 5. Layer Mapping. 
  A file loadlayer.py was created inside the world application, used to map the model and loading data into the database. It contained this code ;
@@ -135,6 +160,9 @@ def run(verbose=True):
  py manage.py makemigrations    
 py manage.py migrate   
  ```
+
+## 6. Querying the database. 
+
 
 
 
