@@ -24,7 +24,7 @@ CREATE TABLE worldmap;
 Installing virtual enviroment with these dependancies : Django, Django-leaflet , gdal wheel, psycopg2 from the command line. 
 
 ### Configure settings file. 
-Database connection is established with appropriate credetials and then enable gdal and leaflet in INSTALLED APP variable by including the contrib.gis module. 
+Database connection is established with appropriate credetials and then enable gdal and leaflet in INSTALLED APP variable by including the gis contrib module, this enables the GeoDjango gis framework. 
 
 ## 3. Geographic Data Modelling. 
 The shapefile containing countries geometries with their corresponding population data must be modelled in a PostreSQL database and be displayed in a Django admin model.
@@ -85,7 +85,11 @@ admin.site.register(City, CityAdmin)
 admin.site.register(WorldCountries, WorldCountriesAdmin)
  ```
 
-## 4. Layer Mapping. 
+## 4. Add Basemap. 
+To change the basemap to leaflet, I created a class that inherits from imported leaflet module rather than model admin. 
+
+
+## 5. Layer Mapping. 
  A file loadlayer.py was created inside the world application, used to map the model and loading data into the database. It contained this code ;
  ```python
  # import modules and models
