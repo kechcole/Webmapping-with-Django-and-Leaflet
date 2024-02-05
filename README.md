@@ -21,6 +21,12 @@ CREATE TABLE worldmap;
 ```
 
 ### Create GeoDjango Project. 
+Installing virtual enviroment with these dependancies : Django, Django-leaflet , gdal wheel, psycopg2 from the command line. 
+
+### Configure settings file. 
+Database connection is established with appropriate credetials and then enable gdal in INSTALLED APP variable by including the contrib.gis module. 
+
+## 3. Geographic Data Modelling. 
 
 
 
