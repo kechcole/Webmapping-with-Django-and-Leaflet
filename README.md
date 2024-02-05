@@ -156,6 +156,7 @@ def run(verbose=True):
     lm.save(strict=True, verbose=verbose)
  ``` 
  To effect the above changes in the database, we need to migrate the new model into the database from the python shell. 
+ 
  ```console
  py manage.py makemigrations    
 py manage.py migrate   
