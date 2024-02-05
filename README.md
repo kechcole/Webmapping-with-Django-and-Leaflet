@@ -116,8 +116,8 @@ world_shp_fullpath = 'D:/WHole Django/Worldmap project/worldmap/data/TM_WORLD_BO
 # Load the data into the database 
 def run(verbose=True):
     # Actual mapping, coz map already transformed give a value of false, else would give srid number
-    lm = LayerMapping(WorldCountries, world_shp_fullpath,  
-                        # layers to be mapped 
+    lm = LayerMapping(WorldCountries, 
+                        world_shp_fullpath,  # layers to be mapped 
                       worldcountries_mapping,   # Dictionary containing the data varaiables
                       transform = False,        # Do not transform the data
                       encoding = 'iso-8859-1'    #encoding
