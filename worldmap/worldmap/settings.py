@@ -89,7 +89,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'worldmap', # project name 
-        'USER': 'postgres',  database name
+        'USER': 'postgres',  # database 
         'HOST': 'localhost', 
         'PASSWORD': '1234COLE',  
         'PORT': '5432',  # port number in which the database listens for user connection
